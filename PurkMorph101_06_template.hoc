@@ -43,8 +43,13 @@ forsec "soma" {gl_Leak=1/somamembraneresist Ra=axialresist cm=1.0*membranecap}
 
 spine_dens = 13
 spine_area = 1.33
+spine_spacing = 0.7531                                            // um; gives 14740 explicit spines for this morphology
 
-nsp = 10                                                         // spines in single compartment
+func explicit_spines() { local n
+	n = int(L/spine_spacing + 0.5)
+	if (n < 1) n = 1
+	return n
+}
 
 func spinecomp() { local a
 	maxdiam = 0
@@ -52,7 +57,7 @@ func spinecomp() { local a
 	if (maxdiam <= 3.1701) {                                 // spine correction only for thin dendrites
 		a = 0
 		for(x) a=a+area(x)
-		F = ((spine_area*(L*spine_dens-nsp)) + a)/a
+		F = ((spine_area*(L*spine_dens-explicit_spines())) + a)/a
 	} else {
 		F = 1 // no spine correction for larger dendrites
 	}
@@ -79,22 +84,22 @@ Spine_Neck = new SectionList()
 nDendrites = 1599
 nsmallDend = 0
 nlargeDend = 0
+nspines = 0
 i = 0
 
-forsec "dend" for(x, 0){
-      if(diam(x)<= 3.1701) {
+forsec "dend" {
+      maxdiam = 0
+      for (x) if (diam(x) > maxdiam) maxdiam = diam(x)
+      if(maxdiam <= 3.1701) {
            sl.append()
-           sl.unique()
            nsmallDend = nsmallDend + 1
+           nspines = nspines + explicit_spines()
 
       } else {
            sthick.append()
-           sthick.unique()
            nlargeDend = nlargeDend+1
               }
 }                             
-
-nspines = nsmallDend*10  // Total spine numbers
 
 create spine_neck[nspines]
 create spine_head[nspines]
@@ -117,13 +122,12 @@ connect spine_head[j](0), spine_neck[j](1)
 
 iii = 0
 forsec sl {
-   jjj  =0.05
-    while(jjj<1){
+   nsp_section = explicit_spines()
+   for kkk = 0, nsp_section-1 {
+       jjj = (kkk + 0.5)/nsp_section
        connect spine_neck[iii](0), jjj
-       jjj += 0.1
        iii+=1
-  
-       }
+   }
 }
 
 for i = 0, nspines-1 spine_head[i] {

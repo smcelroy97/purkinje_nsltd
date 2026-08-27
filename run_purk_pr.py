@@ -169,6 +169,9 @@ def main(argv: Iterable[str] | None = None) -> int:
     print(f"Saved spike times: {spike_path}")
     return 0
 
+# TODO Plot the 3d coordinates of the spine heads to visualize the grid interpolaiton
+# TODO Additionally, should plot grid interpolation variants to visually inspect and choose the correct one
+
 
 if __name__ == "__main__":
     main()
