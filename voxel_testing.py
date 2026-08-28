@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Small, standalone NO-voxel diffusion experiment.
 
 This file does not change the Purkinje model.  It loads the existing model,
